@@ -7,7 +7,7 @@ import { UserModule } from './user/user.module';
 import { NavComponent } from './nav/nav.component';
 
 //import {AngularFireModule} from '@angular/fire/compat'
-import { environment } from 'src/environments/environment.development';
+import { environment } from 'src/environments/environment';
 import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
