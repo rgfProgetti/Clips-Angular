@@ -3,7 +3,7 @@ import {Auth, createUserWithEmailAndPassword, updateProfile, user, signOut} from
 import {Firestore, collection, doc, setDoc, addDoc, CollectionReference} from '@angular/fire/firestore'
 import IUser from '../models/user.model';
 import { Observable, of } from 'rxjs';
-import {delay, map, filter, switchMap} from 'rxjs/operators';
+import {delay, map, filter, switchMap, mergeMap} from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { NavigationEnd } from '@angular/router';
@@ -31,13 +31,21 @@ export class AuthService {
       delay(1000)
     )
 
-    this.router.events.pipe(
-      filter(ev =>ev instanceof NavigationEnd),
-      map(e => this.actRouter.firstChild),
-      switchMap(route => route?.data ?? of({authOnly : false}))
-    ).subscribe((data)=>{this.redirect = data['authOnly'] ?? false})
-
-    
+      this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        map(() => this.actRouter),
+        map((route) => {
+          while (route.firstChild) {
+            route = route.firstChild;
+          }
+          return route;
+        }),
+        mergeMap((route) => route.data)
+      )
+      .subscribe((data) => {
+        this.redirect = data['authOnly'] ?? false;
+      });
   }
 
   public async createUser(userData : IUser){
